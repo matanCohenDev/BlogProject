@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts</title>
+    <link rel="stylesheet" href="/css/PostsStyle.css">
+</head>
+<body>
+    <h2 id="WelcomeMessage"></h2>
+    <div class="container">
+        <div class="addPost">
+            <h2>Add your own post</h2>
+            <label for="author">Author</label>
+            <select id="author" class="author"></select>
+            <label for="title">Title</label>
+            <input type="text" class="title" id="title" required>
+            <label for="content">Content</label>
+            <textarea id="content" class="content" required></textarea>
+            <div class="containerButtons">
+            <input type="submit" id="submitAndResponseBtn" value="Send Post">
+            <input type="submit" id="DeleteAndCancelBtn" value="Delete">
+            </div>
+        </div>
+        <div class="PostsHaveAdded">
+            <table>
+                <tr>
+                    <th>from</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name');
+        const authorSelect = document.getElementById('author');
+        const titleInput = document.getElementById('title');
+        const contentInput = document.getElementById('content');
+        const submitAndResponseBtn = document.getElementById('submitAndResponseBtn');
+        const DeleteAndCancelBtn = document.getElementById('DeleteAndCancelBtn');
+        const table = document.querySelector('.PostsHaveAdded table');
+        const responeToMessage = document.getElementById('responeToMessage');
+        let options = 0;
+
+        document.getElementById('WelcomeMessage').textContent = "Welcome " + name + " to your inbox";
+
+        fetch('/api/users/all-users')
+            .then(response => response.json())
+            .then(users => {
+                users.forEach(user => {
+                    if (user.username !== name) {
+                        const option = document.createElement('option');
+                        option.value = options++;
+                        option.textContent = user.username;
+                        authorSelect.appendChild(option);
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching users:', error));
+        
+        fetch('/api/posts/posts')
+            .then(response => response.json())
+            .then(posts => {
+                posts.forEach(post => {
+                if(post.author === name){
+                const row = table.insertRow(-1);
+                const fromCell = row.insertCell(0);
+                const messageCell = row.insertCell(1);
+                const dateCell = row.insertCell(2);
+                fromCell.textContent = post.fromUser;
+                messageCell.textContent = post.content;
+                dateCell.textContent = new Date(post.createdAt).toLocaleString();
+
+                row.addEventListener('click', function() {
+                    for (let i = 1; i < table.rows.length; i++) { 
+                        table.rows[i].classList.remove('selected');
+                    }
+                    this.classList.add('selected');
+                });
+                row.addEventListener('dblclick', function() {
+                    submitAndResponseBtn.value = 'Response';
+                    DeleteAndCancelBtn.value = 'Cancel';
+                    for(let i = 0; i < authorSelect.options.length; i++) {
+                       if(authorSelect.options[i].text == row.cells[0].textContent) {
+                           authorSelect.selectedIndex = i;
+                           authorSelect.disabled = true;
+                           break;
+                       }
+                    }
+                });
+
+                DeleteAndCancelBtn.addEventListener('click', async (event) => {
+                event.preventDefault();
+                if(DeleteAndCancelBtn.value === 'Delete'){
+                    titleInput.value = '';
+                    contentInput.value = '';
+                }
+                if(DeleteAndCancelBtn.value === 'Cancel'){
+                    authorSelect.disabled = false;
+                    submitAndResponseBtn.value = 'Send Post';
+                    DeleteAndCancelBtn.value = 'Delete';
+                    for(let i = 0 ; i < table.rows.length; i++)
+                        table.rows[i].classList.remove('selected');
+                }
+            });
+        }
+    });
+})
+            .catch(error => console.error('Error fetching posts:', error));
+            submitAndResponseBtn.addEventListener('click', async (event) => {
+            event.preventDefault(); 
+
+            const title = titleInput.value;
+            const content = contentInput.value;
+            const author = authorSelect.options.item(authorSelect.selectedIndex).text;
+
+            if (!title || !content || !author) {
+                alert('Please fill in all fields');
+                return;
+            }
+            try {
+                const response = await fetch('/api/posts/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, content, fromUser: name, author: author })
+                });
+
+                if (response.ok) {
+                    alert('Post sent successfully!');
+                    window.location.href = 'posts.html?name=' + name; 
+                } else {
+                    alert('Server Error');
+                    console.error('Error');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        });
+    </script>
+</body>
+</html>
