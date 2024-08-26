@@ -34,6 +34,13 @@ const postRoutes = require('./routes/chat-routes');
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 
+app.use('/register' , (req, res) => {
+    res.sendFile(path.join(__dirname, 'public','html' , 'register.html'));
+});
+app.use('/login' , (req, res) => {
+    res.sendFile(path.join(__dirname, 'public','html' , 'login.html'));
+});
+
 
 app.use('/' , (req, res) => {
     if(req.session.userId){
