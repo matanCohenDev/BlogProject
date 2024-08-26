@@ -21,10 +21,6 @@ const register = async (req, res) => {
     }
 };
 
-const registerPage = (req, res) => {
-    res.sendFile(__dirname , 'public' , 'html' , 'register.html');
-}
-
 const login = async (req, res) => {
     const { username, password } = req.body;
 
@@ -45,10 +41,6 @@ const login = async (req, res) => {
         res.status(500).json({ msg: 'Server error' });
     }
 };
-
-const loginPage = (req, res) => {
-    res.sendFile(__dirname + '/public/html/login.html');
-}
 
 const ownUser = async (req, res) => {
     if(!req.session.userId) {
@@ -78,4 +70,4 @@ const allUsers = async (req, res) => {
     }
 };
 
-module.exports = { register, login, allUsers , ownUser, registerPage ,loginPage};
+module.exports = { register, login, allUsers , ownUser};
