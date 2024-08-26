@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
+const session = require('express-session');
 
 const app = express();
 
@@ -18,13 +19,31 @@ mongoose.connect('mongodb+srv://matancz99:Mcz858585@cluster0.8jkzb.mongodb.net/'
     console.log('error', err);
 });
 
+app.use(session({
+    secret: 'My only secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}))
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-const userRoutes = require('./routes/users');
-const postRoutes = require('./routes/posts');
+const userRoutes = require('./routes/users-routes');
+const postRoutes = require('./routes/chat-routes');
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+
+
+app.use('/' , (req, res) => {
+    if(req.session.userId){
+        res.sendFile(path.join(__dirname, 'public','html' , 'posts.html'));
+    }
+    else{
+        res.sendFile(path.join(__dirname, 'public','html' , 'login.html'));
+    }
+});
+
 
 const port = 3000;
 app.listen(port, () => {
