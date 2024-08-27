@@ -1,20 +1,19 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #0f0c29;
-    background: linear-gradient(135deg, #6565e6, #302b63, #0f0c29);
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #08088a, #4d489b, #2c2190);
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.loginContainer {
+.loginContainer { 
     background: rgba(255, 255, 255, 0.1);
     padding: 40px 50px;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
     max-width: 400px;
     width: 100%;
@@ -35,7 +34,7 @@ body {
 h1 {
     margin-bottom: 20px;
     color: #ffffff;
-    font-size: 20px;
+    font-size: 22px;
     letter-spacing: 2px;
     text-transform: uppercase;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -52,8 +51,7 @@ label {
 
 input[type="text"],
 input[type="password"],
-input[type="email"],
-input[type="tel"] {
+input[type="email"] {
     width: 80%;
     padding: 10px;
     margin-bottom: 20px;
@@ -67,10 +65,9 @@ input[type="tel"] {
 input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus {
-    border-color: #6a82fb;
+    border-color: #3498db;
     background-color: rgba(255, 255, 255, 0.2);
     outline: none;
-    text-align: center;
 }
 
 input[type="submit"] {
@@ -78,28 +75,29 @@ input[type="submit"] {
     padding: 10px;
     border: none;
     border-radius: 5px;
-    background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+    background: linear-gradient(135deg, #3498db, #2980b9);
     color: white;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 input[type="submit"]:hover {
-    background: linear-gradient(135deg, #fc5c7d, #6a82fb);
+    background: linear-gradient(135deg, #2980b9, #3498db);
     transform: translateY(-2px);
 }
 
 a {
     display: block;
     margin-top: 20px;
-    color: #6a82fb;
+    color: #3498db;
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s, transform 0.3s;
 }
 
 a:hover {
-    color: #fc5c7d;
+    color: #1f2122;
     transform: translateY(-2px);
 }
