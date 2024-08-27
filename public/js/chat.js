@@ -51,14 +51,14 @@ function FetchCurrentUserNameLoggedIn() {
         })
         .catch(error => console.error('Error:', error));
 }
-
+//dsjkfbsuhbdfadsv
 function FetchUsers() {
     FetchCurrentUserNameLoggedIn();
     fetch('/api/users/all-users')
         .then(response => response.json())
         .then(data => {
             data.forEach(user => {
-                if(user.username !== currentUser){
+                if(user.username != currentUser){
                 const userElement = document.createElement('div');
                 userElement.className = 'user';
                 userElement.innerHTML = user.username;
