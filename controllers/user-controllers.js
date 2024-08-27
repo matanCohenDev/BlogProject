@@ -70,4 +70,14 @@ const allUsers = async (req, res) => {
     }
 };
 
-module.exports = { register, login, allUsers , ownUser};
+const logout = async (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ msg: 'Failed to logout' });
+        }
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.status(200).json({ msg: 'Logged out successfully' });
+    });
+};
+
+module.exports = { register, login, allUsers , ownUser, logout};

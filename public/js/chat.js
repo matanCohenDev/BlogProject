@@ -1,9 +1,10 @@
-
 const userList = document.getElementsByClassName('user-list')[0];
 const messagesList = document.getElementsByClassName('messages')[0];
 const messageInput = document.getElementsByClassName('message')[0];
 const sendButton = document.getElementsByClassName('send')[0];
 const implementUser = document.getElementsByClassName('currentUser')[0];
+const logoutButton = document.getElementsByClassName('logout')[0];
+const searchInput = document.getElementsByClassName('search')[0];
 let currentUser = ' ';
 let ChatWith = ' ';
 
@@ -22,7 +23,7 @@ function FetchMessages(username) {
                 }
                 if (post.author === currentUser && post.fromUser === username) {
                     const messageElement = document.createElement('div');
-                    messageElement.className = 'message received'; // Corrected class name
+                    messageElement.className = 'message received';
                     messageElement.innerHTML = post.content;
                     messagesList.appendChild(messageElement);
                 }
@@ -51,7 +52,7 @@ function FetchCurrentUserNameLoggedIn() {
         })
         .catch(error => console.error('Error:', error));
 }
-//dsjkfbsuhbdfadsv
+
 function FetchUsers() {
     FetchCurrentUserNameLoggedIn();
     fetch('/api/users/all-users')
@@ -96,7 +97,48 @@ function SendMessage() {
     messageInput.value = '';
 }
 
+async function Logout() {
+    try {
+        const res = await fetch('/api/users/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (res.ok) {
+            window.location.href = '/'; 
+        } else {
+            alert('Logout failed. Please try again.');
+        }
+    } catch (err) {
+        console.error('An error occurred during logout:', err);
+        alert('An error occurred. Please try again later.');
+    }
+}
+
+function FilterUsersBySearch() {
+    const searchValue = searchInput.value.toLowerCase();
+    const users = document.getElementsByClassName('user');
+    for (let i = 0; i < users.length; i++) {
+        const username = users[i].textContent.toLowerCase();
+        if (username.includes(searchValue)) {
+            users[i].style.display = 'block';
+        } else {
+            users[i].style.display = 'none';
+        }
+    }
+}
+
+function PressEnterToSendMessage() {
+    messageInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            SendMessage();
+        }
+    });
+}
+
 window.onload = () => {
     FetchUsers();
     sendButton.addEventListener('click', SendMessage);
+    logoutButton.addEventListener('click', Logout);
+    searchInput.addEventListener('input', FilterUsersBySearch);
+    messageInput.addEventListener('keydown', PressEnterToSendMessage);
 };
