@@ -12,9 +12,8 @@ const groupMembersAdded = document.getElementById('group-members-have-added');
 const searchUsersToInsertInGroup = document.getElementById('search-users-group');
 const cancelBtn = document.querySelector('.cancel');
 const createBtn = document.querySelector('.create');
-let currentUser = ' ';
-let ChatWith = ' ';
-
+let currentUser = '';
+let ChatWith = '';
 
 function FetchMessages(username) {
     messagesList.innerHTML = '';
@@ -39,23 +38,25 @@ function FetchMessages(username) {
         .catch(error => console.error('Error fetching messages:', error));
 }
 
-function FetchMessagesFromGroup(groupname){
-    messagesList.innerHtml=' ';
-    fetch('/api/groupChat/groupChat')
+async function FetchMessagesFromGroup(groupname){
+    messagesList.innerHTML= '';
+    await fetch('/api/groupChat/groupChat')
         .then(response => response.json())
         .then(data => {
             data.forEach(gMessage => {
-                if(gMessage.MessageFrom == currentUser && gMessage.nameGroup == groupname){
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'message sent';
-                    messageElement.innerHTML = gMessage.MessageContent;
-                    messagesList.appendChild(messageElement);
-                }
-                else if (gMessage.nameGroup == groupname) {
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'message received';
-                    messageElement.innerHTML = gMessage.MessageFrom + ": " + gMessage.MessageContent;
-                    messagesList.appendChild(messageElement);
+                if(gMessage.nameGroup === groupname){
+                    if(gMessage.MessageFrom === currentUser){
+                        const messageElement = document.createElement('div');
+                        messageElement.className = 'message sent';
+                        messageElement.innerHTML = gMessage.MessageContent;
+                        messagesList.appendChild(messageElement);
+                    }
+                    else {
+                        const messageElement = document.createElement('div');
+                        messageElement.className = 'message received';
+                        messageElement.innerHTML = gMessage.MessageFrom + ": " + gMessage.MessageContent;
+                        messagesList.appendChild(messageElement);
+                    }
                 }
             });
         })
@@ -63,85 +64,122 @@ function FetchMessagesFromGroup(groupname){
 
 }
 
+async function checkIfUserOrGroup(chatWith) {
+    try {
+        const usersResponse = await fetch('/api/users/all-users');
+        const usersData = await usersResponse.json();
+
+        const isUser = usersData.some(user => user.username === chatWith);
+        if (isUser) {
+            FetchMessages(chatWith);
+            sendButton.onclick = SendMessage;
+            return;
+        }
+
+        const groupsResponse = await fetch('/api/groupList/GetgroupsList');
+        const groupsData = await groupsResponse.json();
+
+        const isGroup = groupsData.some(group => group.nameGroup === chatWith);
+        if (isGroup) {
+            FetchMessagesFromGroup(chatWith);
+            sendButton.onclick = SendMessageToGroup;
+        }
+    } catch (error) {
+        console.error('Error checking if user or group:', error);
+    }
+}
+
 function implementUserToChat() {
     const users = document.getElementsByClassName('user');
     for (let i = 0; i < users.length; i++) {
         users[i].addEventListener('click', function () {
-            implementUser.textContent = "chat with " + this.textContent;
+            implementUser.textContent = "Chat with " + this.textContent;
             ChatWith = this.textContent;
-            FetchMessages(this.textContent);
-            FetchMessagesFromGroup(this.textContent);
+            checkIfUserOrGroup(ChatWith);
         });
     }
 }
 
-function FetchCurrentUserNameLoggedIn() {
-    return fetch('/api/users/user')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data.user);
-            currentUser = data.user;
-        })
-        .catch(error => console.error('Error:', error));
+async function FetchCurrentUserNameLoggedIn() {
+    try {
+        const response = await fetch('/api/users/user');
+        const data = await response.json();
+        currentUser = data.user;
+    } catch (error) {
+        console.error('Error fetching current user:', error);
+    }
 }
 
 async function FetchUsersAndGroups() {
-    await FetchCurrentUserNameLoggedIn(); 
+    await FetchCurrentUserNameLoggedIn();
 
-    fetch('/api/users/all-users')
-        .then(response => response.json())
-        .then(data => { 
-            data.forEach(user => {
-                if(user.username != currentUser){ 
-                    const userElement = document.createElement('div');
-                    userElement.className = 'user';
-                    userElement.innerHTML = user.username;
-                    userElement.id = user._id;
-                    userList.appendChild(userElement);
-                }
-            });
-            implementUserToChat(); 
-        })
-        .catch(error => console.error('Error fetching users:', error));
+    try {
+        const usersResponse = await fetch('/api/users/all-users');
+        const usersData = await usersResponse.json();
 
-    fetch('/api/groupList/GetgroupsList')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(group => {
-                if(group.Members.includes(currentUser)){ 
-                    const groupElement = document.createElement('div');
-                    groupElement.className = 'user';
-                    groupElement.innerHTML = group.nameGroup;
-                    userList.appendChild(groupElement);
-                }
-            });
-            implementUserToChat(); 
-        })
-        .catch(error => console.error('Error fetching groups:', error));
+        usersData.forEach(user => {
+            if (user.username !== currentUser) {
+                const userElement = document.createElement('div');
+                userElement.className = 'user';
+                userElement.innerHTML = user.username;
+                userList.appendChild(userElement);
+            }
+        });
+
+        const groupsResponse = await fetch('/api/groupList/GetgroupsList');
+        const groupsData = await groupsResponse.json();
+
+        groupsData.forEach(group => {
+            if (group.Members.includes(currentUser)) {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'user';
+                groupElement.innerHTML = group.nameGroup;
+                userList.appendChild(groupElement);
+            }
+        });
+
+        implementUserToChat();
+    } catch (error) {
+        console.error('Error fetching users and groups:', error);
+    }
 }
 
-function SendMessage() {
-    const title = ' ';
-    const message = messageInput.value;
-    const author = ChatWith;
-    const fromUser = currentUser;
-    if (message === '') {
-        return;
+async function SendMessage() {
+    const message = messageInput.value.trim();
+    if (message === '') return;
+
+    const payload = { title: '', content: message, author: ChatWith, fromUser: currentUser };
+    try {
+        await fetch('/api/posts/posts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        FetchMessages(ChatWith);
+    } catch (error) {
+        console.error('Error sending message:', error);
+    } finally {
+        messageInput.value = '';
     }
-    fetch('/api/posts/posts', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title: title , content: message, author, fromUser }),
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            FetchMessages(author);
-        })
-        .catch(error => console.error('Error sending message:', error));
-    messageInput.value = '';
+}
+
+async function SendMessageToGroup() {
+    const message = messageInput.value.trim();
+    if (message === '') return;
+
+    const payload = { nameGroup: ChatWith, MessageContent: message, MessageFrom: currentUser };
+    try {
+        await fetch('/api/groupChat/groupChat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        FetchMessagesFromGroup(ChatWith);
+    } catch (error) {
+        console.error('Error sending message to group:', error);
+    } finally {
+        messageInput.value = '';
+    }
 }
 
 async function Logout() {
@@ -151,7 +189,7 @@ async function Logout() {
             headers: { 'Content-Type': 'application/json' }
         });
         if (res.ok) {
-            window.location.href = '/'; 
+            window.location.href = '/';
         } else {
             alert('Logout failed. Please try again.');
         }
@@ -166,31 +204,28 @@ function FilterUsersBySearch() {
     const users = document.getElementsByClassName('user');
     for (let i = 0; i < users.length; i++) {
         const username = users[i].textContent.toLowerCase();
-        if (username.includes(searchValue)) {
-            users[i].style.display = 'block';
-        } else {
-            users[i].style.display = 'none';
-        }
+        users[i].style.display = username.includes(searchValue) ? 'block' : 'none';
     }
 }
 
 function PressEnterToSendMessage() {
     messageInput.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
-            SendMessage();
+            sendButton.onclick();
         }
     });
 }
 
 function EnterAllUsersToSelcectOptions(){
+    
     fetch('/api/users/all-users')
         .then(response => response.json())
         .then(data => {
             data.forEach(user => {
-                if(user.username != currentUser){
-                const userElement = document.createElement('option');
-                userElement.innerHTML = user.username;
-                groupMembers.appendChild(userElement);
+                if(user.username !== currentUser){
+                    const userElement = document.createElement('option');
+                    userElement.innerHTML = user.username;
+                    groupMembers.appendChild(userElement);
                 }
             });
             AddUsersBydoubleClick();
@@ -203,11 +238,7 @@ function FilterUsersToInsertInGroup(){
     const users = document.querySelectorAll('.group-members option');
     for (let i = 0; i < users.length; i++) {
         const username = users[i].textContent.toLowerCase();
-        if (username.includes(searchValue)) {
-            users[i].style.display = 'block';
-        } else {
-            users[i].style.display = 'none';
-        }
+        users[i].style.display = username.includes(searchValue) ? 'block' : 'none';
     }
 }
 
@@ -215,7 +246,6 @@ function AddUsersBydoubleClick(){
     const users = document.querySelectorAll('.group-members option');
     users.forEach(user => {
         user.addEventListener('dblclick', function() {
-            console.log(user.textContent);
             const userElement = document.createElement('option');
             userElement.innerHTML = user.textContent;
             groupMembersAdded.appendChild(userElement);
@@ -224,65 +254,68 @@ function AddUsersBydoubleClick(){
     });
 }
 
+// function removeUsersByDoubleClick(){
+//     const users = document.querySelectorAll('#group-members-have-added option');
+//     users.forEach(user => {
+//         user.addEventListener('dblclick', function() {
+//             const userElement = document.createElement('option');
+//             userElement.innerHTML = user.textContent;
+//             groupMembers.appendChild(userElement);
+//             user.remove(); 
+//         });
+//     });
+// }
+
 function CancelCreateGroup(){
     const users = document.querySelectorAll('option');
-    users.forEach(user => {
-        user.remove();
-    });
+    users.forEach(user => user.remove());
     EnterAllUsersToSelcectOptions();
     popupOverlay.style.display = 'none';
 }
 
 function createGroup(){
-    const groupMembers = document.querySelectorAll('#group-members-have-added option');
     const groupName = document.getElementById('group-name').value;
-    if(groupName === ''){
-        return;
-    }
-    const members = [];
-    members.push(currentUser);  
+    if(groupName === '') return;
+
+    const members = [currentUser];
+    const groupMembers = document.querySelectorAll('#group-members-have-added option');
+
     groupMembers.forEach(member => {
         members.push(member.textContent);
     });
-    console.log(members);
+
     fetch('/api/groupList/groupsList', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nameGroup: groupName, Members: members}),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nameGroup: groupName, Members: members }),
     })
-        .then(response => response.json())
-        .then(data => {
-            
-            CancelCreateGroup();
-        })
-        .catch(error => console.error('Error creating group:', error));
-        const users = document.querySelectorAll('.user');
-    users.forEach(user => {
-        user.remove();
-    });
-    FetchUsersAndGroups();
+    .then(response => response.json())
+    .then(() => {
+        CancelCreateGroup();
+        FetchUsersAndGroups();
+    })
+    .catch(error => console.error('Error creating group:', error));
 }
 
 function RunningChat() {
     window.onload = () => {
         FetchUsersAndGroups();
-        sendButton.addEventListener('click', SendMessage);
+        sendButton.addEventListener('click', () => {
+            if (ChatWith) 
+                checkIfUserOrGroup(ChatWith);
+        });
+        PressEnterToSendMessage();
         logoutButton.addEventListener('click', Logout);
         searchInput.addEventListener('input', FilterUsersBySearch);
-        messageInput.addEventListener('keydown', PressEnterToSendMessage);
         searchUsersToInsertInGroup.addEventListener('input', FilterUsersToInsertInGroup);
-        createGroupBtn.addEventListener('click', () => { popupOverlay.style.display = 'flex'; });
+        
+        createGroupBtn.addEventListener('click', () => {
+            popupOverlay.style.display = 'flex';
+            EnterAllUsersToSelcectOptions();
+        });
         cancelBtn.addEventListener('click', CancelCreateGroup);
         createBtn.addEventListener('click', createGroup);
-        EnterAllUsersToSelcectOptions();
     };
 }
 
-
-
-
-
 RunningChat();
-
