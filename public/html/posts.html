@@ -11,6 +11,7 @@
     <div class="chat-container">
         <div class="user-list">
             <input type="text" class="search" placeholder="Search">
+            <button class="create-group-btn">Create Group</button>
 
             <!-- <div class="user">
                 <div class="user-avatar">A</div>
@@ -37,6 +38,39 @@
             </div>
         </div>
     </div>
+
+    <div class="popup-overlay">
+        <div class="popup">
+            <h2>Create Group</h2>
+            <label for="group-name">Group Name:</label>
+            <input type="text" id="group-name" class="group-name" placeholder="Enter group name">
+
+            <label for="group-name">Search Members:</label>
+            <input text="search" class="search" id="search-users-group" placeholder="Search">
+
+            <label for="group-members">Select Members:</label>
+            <select id="group-members" class="group-members" multiple>
+                <!-- Add options dynamically using JS or hardcoded options -->
+                <!-- <option value="alice">Alice</option>
+                <option value="bob">Bob</option>
+                <option value="charlie">Charlie</option> -->
+                <!-- Add more members here -->
+            </select>
+            <label for="group-members">Users have added:</label>
+            <select id="group-members-have-added" class="group-members" multiple>
+                <!-- Add options dynamically using JS or hardcoded options -->
+                <!-- <option value="alice">Alice</option>
+                <option value="bob">Bob</option>
+                <option value="charlie">Charlie</option> -->
+                <!-- Add more members here -->
+            </select>
+            <div class="popup-buttons">
+                <button class="cancel">Cancel</button>
+                <button class="create">Create</button>
+            </div>
+        </div>
+    </div>
+    
     <script src="../js/chat.js"></script>
 </body>
 </html>
