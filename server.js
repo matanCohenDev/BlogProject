@@ -30,9 +30,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const userRoutes = require('./routes/users-routes');
 const postRoutes = require('./routes/chat-routes');
+const groupChatRoutes = require('./routes/groupChat-routes');
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/groupChat', groupChatRoutes);
+app.use('/api/groupList', require('./routes/groupsList'));
 
 app.use('/register' , (req, res) => {
     res.sendFile(path.join(__dirname, 'public','html' , 'register.html'));

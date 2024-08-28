@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/postDB');
-const bcrypt = require('bcryptjs');
 
 const AddMessage = async (req, res) => {
     const { title, content, fromUser, author } = req.body;
