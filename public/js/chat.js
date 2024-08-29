@@ -220,6 +220,7 @@ function PressEnterToSendMessage() {
 }
 
 function EnterAllUsersToSelcectOptions(){
+    
     fetch('/api/users/all-users')
         .then(response => response.json())
         .then(data => {
