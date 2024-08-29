@@ -111,6 +111,9 @@ async function FetchCurrentUserNameLoggedIn() {
 }
 
 async function FetchUsersAndGroups() {
+    const dynamicElements = userList.querySelectorAll('.user');
+    dynamicElements.forEach(element => element.remove());
+
     await FetchCurrentUserNameLoggedIn();
 
     try {
@@ -229,6 +232,7 @@ function EnterAllUsersToSelcectOptions(){
                 }
             });
             AddUsersBydoubleClick();
+            
         })
         .catch(error => console.error('Error fetching users:', error));
 }
@@ -242,29 +246,22 @@ function FilterUsersToInsertInGroup(){
     }
 }
 
-function AddUsersBydoubleClick(){
+function AddUsersBydoubleClick() {
     const users = document.querySelectorAll('.group-members option');
     users.forEach(user => {
-        user.addEventListener('dblclick', function() {
-            const userElement = document.createElement('option');
-            userElement.innerHTML = user.textContent;
-            groupMembersAdded.appendChild(userElement);
-            user.remove(); 
-        });
+        user.removeEventListener('dblclick', handleUserDoubleClick);
+        user.addEventListener('dblclick', handleUserDoubleClick);
     });
 }
 
-// function removeUsersByDoubleClick(){
-//     const users = document.querySelectorAll('#group-members-have-added option');
-//     users.forEach(user => {
-//         user.addEventListener('dblclick', function() {
-//             const userElement = document.createElement('option');
-//             userElement.innerHTML = user.textContent;
-//             groupMembers.appendChild(userElement);
-//             user.remove(); 
-//         });
-//     });
-// }
+function handleUserDoubleClick(event) {
+    const user = event.target;
+    const userElement = document.createElement('option');
+    userElement.innerHTML = user.textContent;
+    groupMembersAdded.appendChild(userElement);
+    user.remove(); 
+    console.log(user.textContent);
+}
 
 function CancelCreateGroup(){
     const users = document.querySelectorAll('option');
