@@ -232,7 +232,7 @@ function EnterAllUsersToSelcectOptions(){
                 }
             });
             AddUsersBydoubleClick();
-            
+            removerUserByDoubleClick();
         })
         .catch(error => console.error('Error fetching users:', error));
 }
@@ -261,6 +261,24 @@ function handleUserDoubleClick(event) {
     groupMembersAdded.appendChild(userElement);
     user.remove(); 
     console.log(user.textContent);
+    removerUserByDoubleClick();
+}
+
+function removerUserByDoubleClick(){
+    const users = document.querySelectorAll('#group-members-have-added option');
+    users.forEach(user => {
+        user.removeEventListener('dblclick', handleUserRemoverDoubleClick);
+        user.addEventListener('dblclick', handleUserRemoverDoubleClick);
+    });
+}
+
+function handleUserRemoverDoubleClick(event){
+    const user = event.target;
+    const userElement = document.createElement('option');
+    userElement.innerHTML = user.textContent;
+    groupMembers.appendChild(userElement);
+    user.remove();
+    AddUsersBydoubleClick();
 }
 
 function CancelCreateGroup(){
