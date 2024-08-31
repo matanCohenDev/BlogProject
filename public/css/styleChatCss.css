@@ -33,6 +33,7 @@ body {
 .user {
     display: flex;
     align-items: center;
+    flex-direction: row;
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 15px;
@@ -123,9 +124,8 @@ body {
 
 .message-input {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: right;
+    align-items: center; /* Center aligns the input and button vertically */
+    justify-content: space-between; /* Ensures spacing between input and button */
     padding: 20px;
     background-color: #bdc3c7;
     box-sizing: border-box;
@@ -138,14 +138,12 @@ body {
     border: none;
     font-size: 16px;
     padding: 10px 15px;
-    margin-right: 15px;
     background-color: #ffffff;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.2s ease;
-    position: absolute;
-    width:70%;
-    margin-top:25px;
-    margin-right:8%;
+    margin-right: 15px;
+    width:100%;
+    max-width: 85%;
 }
 
 .message-input input:focus {
@@ -163,13 +161,19 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-right:2%;
+    flex-shrink: 0;
+    height: 40px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin-bottom: 2%;
 }
 
 .message-input button:hover {
     background-color: #174d21;
     transform: scale(1.05);
 }
+
 
 .logout {
     padding: 10px 20px;
@@ -228,7 +232,7 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    display: none; /* Hidden by default */
+    display: none; 
     justify-content: center;
     align-items: center;
 }

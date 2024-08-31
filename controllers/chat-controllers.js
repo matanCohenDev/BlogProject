@@ -3,10 +3,10 @@ const router = express.Router();
 const Post = require('../models/postDB');
 
 const AddMessage = async (req, res) => {
-    const { title, content, fromUser, author } = req.body;
+    const { content, fromUser, toUser } = req.body;
 
     try {
-        const newPost = new Post({ title, content, fromUser, author });
+        const newPost = new Post({ content, fromUser, toUser });
         await newPost.save();
         res.status(201).json({ msg: 'Post created successfully' });
     } catch (err) {

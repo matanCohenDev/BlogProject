@@ -21,13 +21,13 @@ function FetchMessages(username) {
         .then(response => response.json())
         .then(data => {
             data.forEach(post => {
-                if (post.fromUser === currentUser && post.author === username) {
+                if (post.fromUser === currentUser && post.toUser === username) {
                     const messageElement = document.createElement('div');
                     messageElement.className = 'message sent';
                     messageElement.innerHTML = post.content;
                     messagesList.appendChild(messageElement);
                 }
-                if (post.author === currentUser && post.fromUser === username) {
+                if (post.toUser === currentUser && post.fromUser === username) {
                     const messageElement = document.createElement('div');
                     messageElement.className = 'message received';
                     messageElement.innerHTML = post.content;
@@ -151,7 +151,7 @@ async function SendMessage() {
     const message = messageInput.value.trim();
     if (message === '') return;
 
-    const payload = { title: '', content: message, author: ChatWith, fromUser: currentUser };
+    const payload = { content: message, toUser: ChatWith, fromUser: currentUser };
     try {
         await fetch('/api/posts/posts', {
             method: 'POST',
