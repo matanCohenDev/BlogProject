@@ -25,5 +25,17 @@ const GetMessages = async (req, res) => {
     }
 };
 
+const changeInDbToReadWhenClicker = async (req, res) => {
+    const { id } = req.body;
+    try {
+        const post = await Post.findById(id);
+        post.read = true;
+        await post.save();
+        res.status(200).json({ msg: 'Post updated successfully' });
+    } catch (err) {
+        console.error('Error updating post:', err);
+        res.status(500).json({ msg: 'Server error', error: err.message });
+    }
+}
 
-module.exports = { AddMessage, GetMessages };
+module.exports = { AddMessage, GetMessages , changeInDbToReadWhenClicker};

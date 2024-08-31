@@ -42,6 +42,15 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.countMessagesUnRead {
+    background-color: #3ab44e;
+    color: white;
+    padding: 10px;
+    border-radius: 50%;
+    font-size: 14px;
+    margin-left: auto;
+}
+
 .user:hover {
     background-color: #3a506e;
     transform: scale(1.05);
@@ -91,6 +100,7 @@ body {
     box-sizing: border-box;
     background-color: #ecf0f1;
 }
+
 
 .message {
     margin-bottom: 20px;
@@ -218,6 +228,7 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-bottom: 20px;
+    width:95%;
 }
 
 .create-group-btn:hover {

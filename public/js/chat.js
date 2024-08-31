@@ -15,6 +15,23 @@ const createBtn = document.querySelector('.create');
 let currentUser = '';
 let ChatWith = '';
 
+async function countUnreadMessages(username) {
+    try {
+        const response = await fetch('/api/posts/posts');
+        const data = await response.json();
+        let count = 0;
+        data.forEach(post => {
+            if (post.fromUser === username && post.toUser === currentUser && !post.read) {
+                count++;
+            }
+        });
+        return count;
+    } catch (error) {
+        console.error('Error counting unread messages:', error);
+        return 0; 
+    }
+}
+
 function FetchMessages(username) {
     messagesList.innerHTML = '';
     fetch('/api/posts/posts')
@@ -89,12 +106,35 @@ async function checkIfUserOrGroup(chatWith) {
     }
 }
 
+function changeInDbToReadWhenClicker(username){
+    fetch('/api/posts/posts')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(post => {
+                if(post.fromUser === username && post.toUser === currentUser){
+                    fetch('/api/posts/posts', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: post._id })
+                    })
+                    .catch(error => console.error('Error updating post:', error));
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching messages:', error));
+}
+
 function implementUserToChat() {
     const users = document.getElementsByClassName('user');
     for (let i = 0; i < users.length; i++) {
         users[i].addEventListener('click', function () {
+            if (users[i].lastChild && users[i].lastChild.className === 'countMessagesUnRead') {
+                users[i].removeChild(users[i].lastChild);
+            }
             implementUser.textContent = "Chat with " + this.textContent;
             ChatWith = this.textContent;
+            users[i].textContent = ChatWith;
+            changeInDbToReadWhenClicker(ChatWith);
             checkIfUserOrGroup(ChatWith);
         });
     }
@@ -120,14 +160,22 @@ async function FetchUsersAndGroups() {
         const usersResponse = await fetch('/api/users/all-users');
         const usersData = await usersResponse.json();
 
-        usersData.forEach(user => {
+        for (const user of usersData) {
             if (user.username !== currentUser) {
+                let count = await countUnreadMessages(user.username);  
                 const userElement = document.createElement('div');
                 userElement.className = 'user';
                 userElement.innerHTML = user.username;
                 userList.appendChild(userElement);
+
+                if(count > 0){
+                    const unreadMessage = document.createElement('div');
+                    unreadMessage.className = 'countMessagesUnRead';
+                    unreadMessage.innerHTML = count;
+                    userElement.appendChild(unreadMessage);
+                }
             }
-        });
+        }
 
         const groupsResponse = await fetch('/api/groupList/GetgroupsList');
         const groupsData = await groupsResponse.json();
@@ -334,3 +382,4 @@ function RunningChat() {
 }
 
 RunningChat();
+
