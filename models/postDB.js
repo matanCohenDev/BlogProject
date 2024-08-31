@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema({
-    title: {
-        type:String ,
-    },
     content: {
         type:String ,
         required: true,
@@ -12,7 +9,7 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    author: {
+    toUser: {
         type: String,
         required: true,
     },
