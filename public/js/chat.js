@@ -13,7 +13,8 @@ const searchUsersToInsertInGroup = document.getElementById('search-users-group')
 const cancelBtn = document.querySelector('.cancel');
 const createBtn = document.querySelector('.create');
 let currentUser = '';
-let ChatWith = '';
+let ChatWith = ''
+
 
 async function countUnreadMessages(username) {
     try {
