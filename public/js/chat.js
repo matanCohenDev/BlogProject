@@ -13,7 +13,8 @@ const searchUsersToInsertInGroup = document.getElementById('search-users-group')
 const cancelBtn = document.querySelector('.cancel');
 const createBtn = document.querySelector('.create');
 let currentUser = '';
-let ChatWith = '';
+let ChatWith = ''
+
 
 async function countUnreadMessages(username) {
     try {
@@ -51,6 +52,7 @@ function FetchMessages(username) {
                     messagesList.appendChild(messageElement);
                 }
             });
+            messagesList.scrollTop = messagesList.scrollHeight;
         })
         .catch(error => console.error('Error fetching messages:', error));
 }

@@ -20,7 +20,7 @@ body {
     background-color: #ffffff;
 }
 
-.user-list {
+.side-menu {
     width: 30%;
     background-color: #34495e;
     color: #ecf0f1;
@@ -101,6 +101,11 @@ body {
     background-color: #ecf0f1;
 }
 
+.user-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
 
 .message {
     margin-bottom: 20px;
