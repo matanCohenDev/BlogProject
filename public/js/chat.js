@@ -51,6 +51,7 @@ function FetchMessages(username) {
                     messagesList.appendChild(messageElement);
                 }
             });
+            messagesList.scrollTop = messagesList.scrollHeight;
         })
         .catch(error => console.error('Error fetching messages:', error));
 }
